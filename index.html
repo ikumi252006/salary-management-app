@@ -15,17 +15,26 @@
 
   <h2>案件登録</h2> <!--小見出し-->
 
-  <input type="text" placeholder="案件名">
-  <select>
+  <input type="text" placeholder="案件名"> <!-- 案件名を入力-->
+  <select> <!--選ぶ 基本optionかinputを使う-->
     <option>時給制</option>
     <option>単価制</option>
   </select>
 
-  <input type="number" placeholder="金額">
+  <input type="number" placeholder="金額"> <!--金額を入力-->
 
   <button>登録</button>
+  <h2>案件編集</h2> <!--小見出し-->
+    <input type="text" placeholder="案件名"> <!-- 案件名を編集-->
+  <select> <!--制度の編集-->
+    <option>時給制</option>
+    <option>単価制</option>
+  </select>
 
-  <h2>案件を選択</h2>
+  <input type="number" placeholder="金額"> <!--金額を編集-->
+
+  <button>編集を保存</button>
+  <h2>案件を選択</h2> <!-- 小見出し -->
 
   <select>
     <option>案件を選択</option>
@@ -34,6 +43,8 @@
   <p>勤務日を入力</p>
   <input type="date">
 
+  <p>備考欄</p>
+  <input type="text">
   
   <script src="script.js"></script> <!--script.jsをつなぐ-->
 </body><!--見える部分終わり-->
