@@ -38,9 +38,9 @@
   <h2>案件登録</h2>
 
     <input id="register_Project_Name" type="text" placeholder="案件名"> <!-- 案件名を入力-->
-  <select> <!--選ぶ 基本optionかinputを使う-->
+  <select id="register_Type"> <!--選ぶ 基本optionかinputを使う-->
     <option value="hourly">時給制</option>
-    <option value="fixed">単価制</option>
+    <option value="unit">単価制</option>
   </select>
 
   <input id="register_Salary" type="number" placeholder="金額"> <!--金額を入力-->
@@ -51,31 +51,42 @@
 <div id="edit_Section" style="display: none;">
   <h2>案件編集</h2>
 
-   <button>削除</button>
+   <p>編集したい案件を選択</p>
+   <select id="edit_Project_Select">
+    <option>案件を選択</option>
+   </select>
 
     <input id="edit_Project_Name" type="text" placeholder="案件名"> <!-- 案件名を編集-->
-  <select> <!--制度の編集-->
-    <option>時給制</option>
-    <option>単価制</option>
+  <select id="edit_Type"> <!--制度の編集-->
+    <option value="hourly">時給制</option>
+    <option value="unit">単価制</option>
   </select>
 
   <input id="edit_Salary" type="number" placeholder="金額"> <!--金額を編集-->
 
   <button id="edit_Button">編集を保存</button>
+  <button id="delete_Button">削除</button>
 </div>
 
 <div id="work_Section" style="display: none;">
   <h2>案件選択</h2>
 
+  <p id="work_Result">ここに金額が表示されます</p>
+
    <select id="work_Project_Select">
     <option>案件を選択</option>
   </select>
 
-
+<div id="hourly_System_Section" style="display: none">
   <button id="attend_Button">出勤</button>
   <button id="leaving_Button">退勤</button>
-
+</div>
+  
+<div id="unit_System_Section" style="display: none">
   <input id="work_Number" type="number" placeholder="件数">
+  <Button id="unit_Work_Button">登録</Button>
+</div>
+  
 
   <input id="work_Date" type="date" placeholder="勤務日を入力">
 
