@@ -181,3 +181,24 @@ function renderProjects() {
     });
 }
 //お金の計算
+work_Project_Select.addEventListener("change", function () {
+    const selected = work_Project_Select.value;
+
+    const found = projects.find(function (project) {
+        return project.name === selected;
+    });
+
+    hourly_System_Section.style.display = "none";
+    unit_System_Section.style.display = "none";
+
+    if (!found) return;
+
+    if (found.type === "hourly") {
+        hourly_System_Section.style.display = "block";
+    }
+    if (found.type === "unit") {
+        unit_System_Section.style.display = "block";
+
+    }
+    calculateWorkMoney(found);
+});
