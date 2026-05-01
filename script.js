@@ -202,3 +202,59 @@ work_Project_Select.addEventListener("change", function () {
     }
     calculateWorkMoney(found);
 });
+//計算用関数
+function calculateWorkMoney(project) {
+
+    const result = document.getElementById("work_Result");
+
+    if (project.type === "hourly") {
+
+        const attend_Button = document.getElementById("attend_Button");
+        const leaving_Button = document.getElementById("leaving_Button");
+
+        let timer = null;
+
+        attend_Button.addEventListener("click", function () {
+            
+            const start = Date.now();
+            localStorage.setItem("startTime", start);
+            if (!start) {
+                alert("時間が正しく取得できませんでした");
+                return;
+            }
+            //時間表示
+
+            timer = setInterval(function () {
+                const now = Date.now();
+                const minutes = (now - start) / (1000 * 60);
+
+                result.textContent = "現在の給与:" + Math.floor(minutes * (project.salary / 60)) + "円";
+}, 1000);
+        });
+
+           
+            const start_Date = new Date(Number(start));
+            
+            leaving_Button = document.addEventListener("click", function () {
+                localStorage.setItem("endTime", Date.now());
+                const end = localStorage.getItem("endTime");
+                
+                if (!end) {
+                    alert("時間が正しく取得できませんでした");
+                    return;
+                }
+                const end_Date = new Date(Number(end));
+
+                const hours = (end - start) / (1000 * 60 * 60);
+
+                result.textContent = "今回の給与は給与：" + (hours * project.salary) + "円でした。";
+                
+
+            });
+            
+
+       
+    }
+
+
+}
