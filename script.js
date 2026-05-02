@@ -211,30 +211,61 @@ function calculateWorkMoney(project) {
 
         const attend_Button = document.getElementById("attend_Button");
         const leaving_Button = document.getElementById("leaving_Button");
-        
+        const break_Start_Button = document.getElementById("break_Start_Button");
+        const break_End_Button = document.getElementById("break_End_Button");
+
         let timer = null;
+        let breakStart = null;
+        let totalBreak = 0;
+        let status = "notWorking";
+
+        
 //出勤時
         attend_Button.addEventListener("click", function () {
             
-            const start = Date.now();
+             if (status !== "notWorking") {
+                 alert("すでに出勤しています");
+                 return;
+            }
             
+            status = "working";
+
+            const start = Date.now();
             localStorage.setItem("startTime", start);
+
+            totalBreak = 0;
+
             if (!start) {
                 alert("時間が正しく取得できませんでした");
                 return;
             }
-            //時間表示
+            if (timer) clearInterval(timer);
 
+            //時間表示
+            
             timer = setInterval(function () {
                 const now = Date.now();
-                const minutes = Math.ceil((now - start) / (1000 * 60));
+                let workTime = now - start - totalBreak;
+                const minutes = Math.ceil(workTime / (1000 * 60));
+
+                 if (status === "onBreak") {
+            workTime = breakStart - start - totalBreak;
+        }
                 
-                result.textContent = "現在の給与:" + Math.floor(minutes * (project.salary / 60)) + "円";
-}, 1000);
+                result.textContent = "現在の給与:" + Math.floor(minutes * (project.salary / 60)) + "円";            }, 1000);
         });
 
 //退勤時
         leaving_Button.addEventListener("click", function () {
+         if (status === "notWorking") {
+             alert("出勤していません");
+             return;
+         }
+
+            if (status === "onBreak") {
+                alert("休憩中です");
+                return;
+            }
             const start = Number(localStorage.getItem("startTime"));
             const end = Date.now();
                 localStorage.setItem("endTime", Date.now());
@@ -245,18 +276,39 @@ function calculateWorkMoney(project) {
                     return;
             }
               if (timer) clearInterval(timer);
-                const end_Date = new Date(Number(end));
 
-            const minutes = Math.ceil((end - start) / (1000 * 60));
+            let workTime = now - start - totalBreak;
+
+            const end_Date = new Date(Number(end));
+            const minutes = Math.ceil(workTime / (1000 * 60));
             const salary = Math.floor(minutes * (project.salary / 60));
-      
-                result.textContent = "今回の勤務時間は" + minutes + "分です。給与は：" + (minutes * salary) + "円でした。";
                 
-
+            result.textContent = "今回の勤務時間は" + minutes + "分です。給与は：" + (salary) + "円でした。";
+                
+            status = "notWorking";
             });
-            
+       //休憩開始時
+        break_Start_Button.addEventListener("click", function () {
+            if (status !== "working") {
+        alert("出勤していません");
+                return;
+            }
+            status = "onBreak";
+            breakStart = Date.now();
+        });
+        //休憩終了時
+        break_End_Button.addEventListener("click", function () {
+            if (status !== "onBreak") {
+                alert("休憩中ではありません");
+                return;
+            } 
 
-       
+            const breakTime = Date.now() - breakStart;
+            totalBreak += breakTime;
+            breakStart = null;
+            status = "working"
+});
+        
     }
 
 
