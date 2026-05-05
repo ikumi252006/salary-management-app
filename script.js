@@ -1,3 +1,4 @@
+//htmlのID取得、jsで使えるようにする
 //メニュー
 const menu_Select = document.getElementById("menu_Select"); 
 const register_Section = document.getElementById("register_Section");
@@ -28,8 +29,8 @@ const unit_System_Section = document.getElementById("unit_System_Section");
 //案件読み込み
 const projects = JSON.parse(localStorage.getItem("projects")) || [];
 
+//メニューで選んだものを表示
 
-//メニュー
 menu_Select.addEventListener("change", function () {
 
   register_Section.style.display = "none";
@@ -43,11 +44,13 @@ menu_Select.addEventListener("change", function () {
     }
      if (menu_Select.value === "edit") {
          edit_Section.style.display = "block";
+         //案件の読み込み
          renderProjects(); 
     }
      if (menu_Select.value === "work") {
          work_Section.style.display = "block";
-         renderProjects();
+         //案件の読み込み
+         renderProjects(); 
     }
      if (menu_Select.value === "history") {
     history_Section.style.display = "block";
@@ -57,7 +60,7 @@ menu_Select.addEventListener("change", function () {
     }
 
 });
-//管理者用メニュー
+//管理者用メニューを選んだ際にもう一度選択し、表示
 admin_Menu_Select.addEventListener("change", function () {
 
 admin_Register_Section.style.display = "none";
@@ -71,13 +74,13 @@ if (admin_Menu_Select.value === "admin_Edit") {
   admin_Edit_Section.style.display = "block";
 }
 });
-//案件登録
+//案件登録の処理　
 register_Button.addEventListener("click", function () {
 
     const project_Name = register_Project_Name.value;
     const salary = register_Salary.value;
     const project_Type = register_Type.value;
-    
+    //名前が空なら受け付けない
     if (project_Name === "") {
         alert("案件名を入力してください。");
         return;
@@ -86,34 +89,38 @@ register_Button.addEventListener("click", function () {
     const duplicate = projects.some(function (project) {
         return project.name === project_Name;
     });
-
+    //名前が同じ案件があれば受け付けない
     if (duplicate) {
         alert("同じ名前の案件がすでに存在しています。");
         return;
     }
+    //配列に追加
     projects.push({
         name: project_Name,
         type: project_Type,
         salary: salary
     });
+    //localStorageに追加
     localStorage.setItem("projects", JSON.stringify(projects));
     renderProjects();
 });
-//案件編集
+//案件編集 
 edit_Project_Select.addEventListener("change", function () {
-    const selected = edit_Project_Select.value;
-
+    //選んだ案件の名前取得
+    const selected = edit_Project_Select.value; 
+    //配列から名前を探し、取得
     const found = projects.find(function (p) {
         return p.name === selected;
     });
+    //名前がなければ返す
     if (!found) return;
-
+    //フォームに値をセット
     edit_Project_Name.value = found.name;
     edit_Salary.value = found.salary;
     edit_Type.value = found.type;
 });
 edit_Button.addEventListener("click", function () {
-
+    
     const selected = edit_Project_Select.value;
     const index = projects.findIndex(function (p) {
         return p.name === selected;
@@ -152,6 +159,7 @@ work_Project_Select.addEventListener("change", function () {
     const found_Project = projects.find(function (project) {
         return project.name === selected_Project_Section;
     });
+    if (!found_Project) return;
     hourly_System_Section.style.display = "none";
     unit_System_Section.style.display = "none";
 
