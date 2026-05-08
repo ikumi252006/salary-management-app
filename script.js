@@ -26,6 +26,16 @@ const delete_Button = document.getElementById("delete_Button");
 const work_Project_Select = document.getElementById("work_Project_Select");
 const hourly_System_Section = document.getElementById("hourly_System_Section");
 const unit_System_Section = document.getElementById("unit_System_Section");
+const attend_Button = document.getElementById("attend_Button");
+const leaving_Button = document.getElementById("leaving_Button");
+const break_Start_Button = document.getElementById("break_Start_Button");
+const break_End_Button = document.getElementById("break_End_Button");
+const result = document.getElementById("work_Result");
+let timer = null;
+let breakStart = null;
+let totalBreak = 0;
+let status = "notWorking";
+let currentProject = null;
 //案件読み込み
 const projects = JSON.parse(localStorage.getItem("projects")) || [];
 
@@ -85,7 +95,7 @@ register_Button.addEventListener("click", function () {
         alert("案件名を入力してください。");
         return;
     }
-
+    //duplicateに番号、projectに中身を入力
     const duplicate = projects.some(function (project) {
         return project.name === project_Name;
     });
@@ -109,8 +119,8 @@ edit_Project_Select.addEventListener("change", function () {
     //選んだ案件の名前取得
     const selected = edit_Project_Select.value; 
     //配列から名前を探し、取得
-    const found = projects.find(function (p) {
-        return p.name === selected;
+    const found = projects.find(function (project) {
+        return project.name === selected;
     });
     //名前がなければ返す
     if (!found) return;
@@ -122,30 +132,32 @@ edit_Project_Select.addEventListener("change", function () {
 edit_Button.addEventListener("click", function () {
     
     const selected = edit_Project_Select.value;
+    //indexに配列の番号、projectに中身を入力
     const index = projects.findIndex(function (p) {
         return p.name === selected;
     });
 
     if (index === -1) return;
-
+    //上書き
     projects[index] = {
         name: edit_Project_Name.value,
         salary: edit_Salary.value,
         type: edit_Type.value
     };
+    //ローカルストレージに保存
     localStorage.setItem("projects", JSON.stringify(projects));
 
     renderProjects();
 });
-
+//削除ボタン
 delete_Button.addEventListener("click", function () {
     
     const selected_Name = edit_Project_Select.value;
-
+    //indexに配列の番号、projectに中身を入力
     const index = projects.findIndex(function (project) {
         return project.name === selected_Name;
     });
-
+    //index番目から１個削除
     if (index !== -1) {
         projects.splice(index, 1);
     }
@@ -156,10 +168,13 @@ delete_Button.addEventListener("click", function () {
 //案件選択
 work_Project_Select.addEventListener("change", function () {
     const selected_Project_Section = work_Project_Select.value;
+     //found_Projectに配列の番号、projectに中身を入力
     const found_Project = projects.find(function (project) {
         return project.name === selected_Project_Section;
     });
+    //見つからなければそのまま返す
     if (!found_Project) return;
+    //案件の制度ごとに表示させる
     hourly_System_Section.style.display = "none";
     unit_System_Section.style.display = "none";
 
@@ -171,27 +186,31 @@ work_Project_Select.addEventListener("change", function () {
     }
     
 })
-//案件読み込み
+//案件読み込み　
 function renderProjects() {
     work_Project_Select.innerHTML = "<option>案件を選択</option>";
     edit_Project_Select.innerHTML = "<option>案件を選択</option>";
-    
+    //配列毎に順番にループ
     projects.forEach(function (project) {
+        //HTMLでの<option>を作成
         const option1 = document.createElement("option");
+        //textContentは表示する文字
         option1.textContent = project.name;
+        //HTMLでのvalue = project.name
         option1.value = project.name;
+        //<select>の最後にoptionを追加
         work_Project_Select.appendChild(option1);
-
+        //編集用にもう一つ
         const option2 = document.createElement("option");
         option2.textContent = project.name;
         option2.value = project.name;
         edit_Project_Select.appendChild(option2);
     });
 }
-//お金の計算
+//案件選択画面
 work_Project_Select.addEventListener("change", function () {
     const selected = work_Project_Select.value;
-
+    //選択されている案件の取得
     const found = projects.find(function (project) {
         return project.name === selected;
     });
@@ -200,7 +219,7 @@ work_Project_Select.addEventListener("change", function () {
     unit_System_Section.style.display = "none";
 
     if (!found) return;
-
+    currentProject = found;
     if (found.type === "hourly") {
         hourly_System_Section.style.display = "block";
     }
@@ -208,29 +227,15 @@ work_Project_Select.addEventListener("change", function () {
         unit_System_Section.style.display = "block";
 
     }
-    calculateWorkMoney(found);
+    
 });
-//計算用関数
-function calculateWorkMoney(project) {
-
-    const result = document.getElementById("work_Result");
-
-    if (project.type === "hourly") {
-
-        const attend_Button = document.getElementById("attend_Button");
-        const leaving_Button = document.getElementById("leaving_Button");
-        const break_Start_Button = document.getElementById("break_Start_Button");
-        const break_End_Button = document.getElementById("break_End_Button");
-
-        let timer = null;
-        let breakStart = null;
-        let totalBreak = 0;
-        let status = "notWorking";
-
         
 //出勤時
         attend_Button.addEventListener("click", function () {
-            
+            if (!currentProject) {
+                alert("案件を選択してください");
+                return;
+            }
              if (status !== "notWorking") {
                  alert("すでに出勤しています");
                  return;
@@ -260,7 +265,7 @@ function calculateWorkMoney(project) {
             workTime = breakStart - start - totalBreak;
         }
                 
-                result.textContent = "現在の給与:" + Math.floor(minutes * (project.salary / 60)) + "円";            }, 1000);
+                result.textContent = "現在の給与:" + Math.floor(minutes * (currentProject.salary / 60)) + "円";}, 1000);
         });
 
 //退勤時
@@ -285,11 +290,10 @@ function calculateWorkMoney(project) {
             }
               if (timer) clearInterval(timer);
 
-            let workTime = now - start - totalBreak;
+            let workTime = end - start - totalBreak;
 
-            const end_Date = new Date(Number(end));
             const minutes = Math.ceil(workTime / (1000 * 60));
-            const salary = Math.floor(minutes * (project.salary / 60));
+            const salary = Math.floor(minutes * (currentProject.salary / 60));
                 
             result.textContent = "今回の勤務時間は" + minutes + "分です。給与は：" + (salary) + "円でした。";
                 
@@ -317,7 +321,3 @@ function calculateWorkMoney(project) {
             status = "working"
 });
         
-    }
-
-
-}
