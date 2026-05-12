@@ -1,150 +1,147 @@
-<!DOCTYPE html> <!-- このファイルはhtml -->
-<html lang="ja"> <!-- htmlスタート　このページは日本語 -->
+<!doctype html>
+<!-- このファイルはhtml -->
+<html lang="ja">
+  <!-- htmlスタート　このページは日本語 -->
 
-<head> <!-- 設定 -->
-  <meta charset="UTF-8"> <!-- 文字化け防止　-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- スマホ対応 -->
-  <title>給料管理アプリ</title> <!-- ブラウザのタイトル -->
+  <head>
+    <!-- 設定 -->
+    <meta charset="UTF-8" />
+    <!-- 文字化け防止　-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- スマホ対応 -->
+    <title>給料管理アプリ</title>
+    <!-- ブラウザのタイトル -->
 
-  <link rel="stylesheet" href="style.css"> <!-- style.cssを読み込む-->
-</head> <!-- 設定ここまで -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- style.cssを読み込む-->
+  </head>
+  <!-- 設定ここまで -->
 
-<body> <!-- 画面に見える部分 -->
+  <body>
+    <!-- 画面に見える部分 -->
 
-  <h1>給料管理アプリ</h1> <!--見出し-->
+    <h1>給料管理アプリ</h1>
+    <!--見出し-->
 
-  <p>スタッフを選択</p>
-  <select id="staff">
-  <option value="fujiharu">藤春</option>
-  <option value="miu">美海</option>
-</select>
+    <h2>メニュー</h2>
+    <select id="menu_Select">
+      <option value="">操作を選択</option>
+      <option value="register">案件登録</option>
+      <option value="edit">案件編集</option>
+      <option value="work">案件選択</option>
+      <option value="history">履歴確認</option>
+      <option value="admin_Edit">管理者用:履歴編集</option>
+    </select>
 
-  <p>今日の給料：</p>
+    <div id="register_Section" style="display: none">
+      <h2>案件登録</h2>
+      
+      <input id="register_Project_Name" type="text" placeholder="案件名" />
+      <!-- 案件名を入力-->
+      <select id="register_Type">
+        <!--選ぶ 基本optionかinputを使う-->
+        <option value="hourly">時給制</option>
+        <option value="unit">単価制</option>
+      </select>
 
-  <p>今月の合計：¥0</p>
+      <input id="register_Salary" type="number" placeholder="金額" />
+      <!--金額を入力-->
 
-  <h2>操作を選択</h2>
+      <button id="register_Button">案件を登録</button>
+    </div>
 
-<select id="menu_Select">
-  <option value="">操作を選択</option>
-  <option value="register">案件登録</option>
-  <option value="edit">案件編集</option>
-  <option value="work">案件選択</option>
-  <option value="history">履歴確認</option>
-  <option value="admin_Edit">管理者用:履歴編集</option>
-</select>
+    <div id="edit_Section" style="display: none">
+      <h2>案件編集</h2>
 
-<div id="register_Section" style="display: none;">
-  <h2>案件登録</h2>
+      <p>編集したい案件を選択</p>
+      <select id="edit_Project_Select">
+        <option>案件を選択</option>
+      </select>
 
-    <input id="register_Project_Name" type="text" placeholder="案件名"> <!-- 案件名を入力-->
-  <select id="register_Type"> <!--選ぶ 基本optionかinputを使う-->
-    <option value="hourly">時給制</option>
-    <option value="unit">単価制</option>
-  </select>
+      <input id="edit_Project_Name" type="text" placeholder="案件名" />
+      <!-- 案件名を編集-->
+      <select id="edit_Type">
+        <!--制度の編集-->
+        <option value="hourly">時給制</option>
+        <option value="unit">単価制</option>
+      </select>
 
-  <input id="register_Salary" type="number" placeholder="金額"> <!--金額を入力-->
+      <input id="edit_Salary" type="number" placeholder="金額" />
+      <!--金額を編集-->
 
-  <button id="register_Button">案件を登録</button>
-</div>
+      <button id="edit_Button">編集を保存</button>
+      <button id="delete_Button">削除</button>
+    </div>
 
-<div id="edit_Section" style="display: none;">
-  <h2>案件編集</h2>
+    <div id="work_Section" style="display: none">
+      <h2>案件選択</h2>
 
-   <p>編集したい案件を選択</p>
-   <select id="edit_Project_Select">
-    <option>案件を選択</option>
-   </select>
+      <p id="work_Result">ここに金額が表示されます</p>
 
-    <input id="edit_Project_Name" type="text" placeholder="案件名"> <!-- 案件名を編集-->
-  <select id="edit_Type"> <!--制度の編集-->
-    <option value="hourly">時給制</option>
-    <option value="unit">単価制</option>
-  </select>
+      <select id="work_Project_Select">
+        <option>案件を選択</option>
+      </select>
 
-  <input id="edit_Salary" type="number" placeholder="金額"> <!--金額を編集-->
+      <div id="hourly_System_Section" style="display: none">
+        <button id="attend_Button">出勤</button>
+        <button id="leaving_Button">退勤</button>
+        <button id="break_Start_Button">休始</button>
+        <button id="break_End_Button">休終</button>
+      </div>
 
-  <button id="edit_Button">編集を保存</button>
-  <button id="delete_Button">削除</button>
-</div>
+      <div id="unit_System_Section" style="display: none">
+        <input id="work_Number" type="number" placeholder="件数" />
+        <button id="unit_Work_Button">登録</button>
 
-<div id="work_Section" style="display: none;">
-  <h2>案件選択</h2>
+        <input id="work_Note" type="text" placeholder="備考欄" />
+      </div>
+    </div>
+    <div id="history_Section" style="display: none">
+      <h2>履歴確認</h2>
 
-  <p id="work_Result">ここに金額が表示されます</p>
+      <div id="history_List"></div>
+    </div>
+    <div id="admin_History_Edit_Section" style="display: none">
+      <h2>管理者用：履歴編集</h2>
+      <select id="admin_Menu_Select">
+        <option value="">操作を選択</option>
+        <option value="admin_Register">新しい案件を入力</option>
+        <option value="admin_Edit">案件を編集</option>
+      </select>
+      
+      <div id="admin_Register_Section" style="display: none">
+        <input
+          id="admin_Register_Project_Name"
+          type="text"
+          placeholder="案件名"
+        />
+        <input id="admin_Register_Salary" type="number" placeholder="金額" />
+        <input id="work_Date" type="date" placeholder="勤務日を入力" />
+        <input id="admin_Register_Note" type="text" placeholder="備考欄" />
 
-   <select id="work_Project_Select">
-    <option>案件を選択</option>
-  </select>
+        <button id="admin_Register_Button">登録する</button>
+      </div>
 
-<div id="hourly_System_Section" style="display: none">
-  <button id="attend_Button">出勤</button>
-  <button id="leaving_Button">退勤</button>
-  <button id="break_Start_Button">休始</button>
-  <button id="break_End_Button">休終</button>
-</div>
-  
-<div id="unit_System_Section" style="display: none">
-  <input id="work_Number" type="number" placeholder="件数">
-  <Button id="unit_Work_Button">登録</Button>
-</div>
-  
+      <div id="admin_Edit_Section" style="display: none">
+        <p>編集する案件を選択</p>
 
-  <input id="work_Date" type="date" placeholder="勤務日を入力">
+        <select id="admin_History_Select">
+          <option value="">履歴を選択</option>
+        </select>
 
-  <input id="work_Note" type="text" placeholder="備考欄">
-</div>
+        <input id="admin_Edit_Project_Name" type="text" placeholder="案件名" />
+        <input id="admin_Edit_Number" type="number" placeholder="金額" />
+        <input id="admin_Edit_Note" type="text" placeholder="備考欄" />
 
-<div id="history_Section" style="display: none;">
-  <h2>履歴確認</h2>
-  
-  <ul>
-  <li>項目1</li>
-  <li>項目2</li>
-  <li>項目3</li>
-</ul>
+        <button id="admin_Update_Button">更新する</button>
+        <button id="admin_Delete_Button">削除する</button>
+      </div>
+      <button id="csv_Button">CSV出力</button>
+    </div>
 
-</div>
-<div id="admin_History_Edit_Section" style="display: none;">
-
-  <h2>管理者用：履歴編集</h2>
-<select id="admin_Menu_Select">
-  <option value="admin_Register">新しい案件を入力</option>
-  <option value="admin_Edit">案件を編集</option>
-</select>
-
-<div id="admin_Register_Section" style="display: none;">
-
-<input id="admin_Register_Project_Name" type="text" placeholder="案件名">
-<input id="admin_Register_Salary" type="number" placeholder="金額">
-<input id="admin_Register_Date" type="date" placeholder="勤務日を入力">
-<input id="admin_Register_Note" type="text" placeholder="備考欄">
-
-<button id="admin_Register_Button">登録する</button>
-</div>
-
-<div id="admin_Edit_Section" style="display: none;">
-  <p>編集する案件を選択</p>
-
-  <select>
-  <option>項目1</option>
-  <option>項目2</option>
-  <option>項目3</option>
-  </select>
-
-<input id="admin_Edit_Project_Name" type="text" placeholder="案件名">
-<input id="admin_Edit_Number" type="number" placeholder="金額">
-<input id="admin_Edit_Date" type="date" placeholder="勤務日を入力">
-<input id="admin_Edit_Note" type="text" placeholder="備考欄">
-
-  <button id="admin_Update_Button">更新する</button>
-  <button id="admin_Delete_Button">削除する</button>
-
-</div>
-
-</div>
-
-  <script src="script.js"></script> <!--script.jsをつなぐ-->
-</body><!--見える部分終わり-->
-
-</html><!--html終了-->
+    <script src="script.js"></script>
+    <!--script.jsをつなぐ-->
+  </body>
+  <!--見える部分終わり-->
+</html>
+<!--html終了-->
