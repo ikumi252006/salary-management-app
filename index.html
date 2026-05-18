@@ -14,9 +14,9 @@
 
     <link rel="stylesheet" href="style.css" />
     <!-- style.cssを読み込む-->
-   <script src="https://unpkg.com/xlsx-js-style/dist/xlsx.bundle.js"></script>
+    <script src="https://unpkg.com/xlsx-js-style/dist/xlsx.bundle.js"></script>
     <!--xlsxで出力するときのurl-->
-  </head> 
+  </head>
   <!-- 設定ここまで -->
 
   <body>
@@ -37,7 +37,7 @@
 
     <div id="register_Section" style="display: none">
       <h2>案件登録</h2>
-      
+
       <input id="register_Project_Name" type="text" placeholder="案件名" />
       <!-- 案件名を入力-->
       <select id="register_Type">
@@ -113,7 +113,7 @@
         <option value="admin_Register">新しい案件を入力</option>
         <option value="admin_Edit">案件を編集</option>
       </select>
-      
+
       <div id="admin_Register_Section" style="display: none">
         <input
           id="admin_Register_Project_Name"
@@ -142,7 +142,7 @@
         <button id="admin_Delete_Button">削除する</button>
       </div>
     </div>
-
+    <script type="module" src="firebase.js"></script>
     <script src="script.js"></script>
     <!--script.jsをつなぐ-->
   </body>
