@@ -32,6 +32,7 @@ const leaving_Button = document.getElementById("leaving_Button");
 const break_Start_Button = document.getElementById("break_Start_Button");
 const break_End_Button = document.getElementById("break_End_Button");
 const result = document.getElementById("work_Result");
+const hourly_Work_Note = document.getElementById("hourly_Work_Note");
 let timer = null;
 let breakStart = null;
 let totalBreak = 0;
@@ -42,13 +43,13 @@ let pausedWorkTime = 0;
 const work_Number = document.getElementById("work_Number");
 const unit_Work_Button = document.getElementById("unit_Work_Button");
 const work_Date = document.getElementById("work_Date");
-const work_Note = document.getElementById("work_Note");
+const unit_Work_Note = document.getElementById("unit_Work_Note");
 //案件読み込み
 const projects = JSON.parse(localStorage.getItem("projects")) || [];
 //履歴
 const history_List = document.getElementById("history_List");
 const histories = JSON.parse(localStorage.getItem("histories")) || [];
-//管理者用履歴編集
+//管理者用履歴編集git 
 const admin_Pass = "2525";
 const admin_History_Select = document.getElementById("admin_History_Select");
 const admin_Edit_Project_Name = document.getElementById("admin_Edit_Project_Name");
@@ -61,7 +62,10 @@ const admin_Register_Project_Name = document.getElementById("admin_Register_Proj
 const admin_Register_Salary = document.getElementById("admin_Register_Salary");
 const admin_Register_Note = document.getElementById("admin_Register_Note");
 const admin_Register_Button = document.getElementById("admin_Register_Button");
-
+//CSV出力
+const csv_Button = document.getElementById("csv_Button");
+//xlsx
+const xlsx_Button = document.getElementById("xlsx_Button");
 
 //メニューで選んだものを表示
 menu_Select.addEventListener("change", function () {
@@ -358,13 +362,15 @@ leaving_Button.addEventListener("click", function () {
     const hours = String(Math.floor(total_Seconds / 3600)).padStart(2, "0");
     const minutes = String(Math.ceil((total_Seconds % 3600) / 60)).padStart(2, "0");
     const salary = Math.floor(total_Minutes * (currentProject.salary / 60));
+    const note = hourly_Work_Note.value;
     //historiesにpush
     histories.push({
         type: "hourly",
         date: today_String,
         project: currentProject.name,
         minutes: total_Minutes,
-        salary: salary
+        salary: salary,
+        note: note
     });
     //ローカルストレージに保存
     localStorage.setItem(
@@ -375,6 +381,8 @@ leaving_Button.addEventListener("click", function () {
     result.textContent = " 今回の勤務時間:" + hours + "時間" + minutes + "分 給与 " + (salary) + "円";
     //ステータスを戻す
     status = "notWorking";
+    //備考欄を空にする
+    hourly_Work_Note.value = "";
 });
 //休憩開始時
 break_Start_Button.addEventListener("click", function () {
@@ -415,7 +423,7 @@ unit_Work_Button.addEventListener("click", function () {
     }
     //データの取得
     const count = Number(work_Number.value);
-    const note = work_Note.value;
+    const note = unit_Work_Note.value;
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -465,7 +473,7 @@ function render_Histories() {
             const remainMinutes = history.minutes % 60;
             div.textContent =
                 history.date +
-                " / " +
+                " / 時給制 /" +
                 history.project +
                 " / " +
                 hours +
@@ -480,7 +488,7 @@ function render_Histories() {
 
             div.textContent =
                 history.date +
-                " / " +
+                " / 単価制 / " +
                 history.project +
                 " / " +
                 history.count +
@@ -493,7 +501,7 @@ function render_Histories() {
 
             div.textContent =
                 history.date +
-                " / " +
+                " / 管理者追加 / " +
                 history.project +
                 " / " +
                 history.salary +
@@ -700,4 +708,159 @@ admin_Register_Button.addEventListener("click", function () {
     render_Admin_Histories();
 
     alert("履歴を追加しました");
+});
+//CSV出力
+csv_Button.addEventListener("click", function () {
+    //1行目 7項目作る
+    let csv = "日付,案件名,種類,勤務時間,件数,給与,備考\n"
+    histories.forEach(function (history) {
+        let line = "";
+        //7項目それぞれの場所に入力していく 入力しない場所は""
+        //時給制
+        if (history.type === "hourly") {
+            line = history.date + "," +
+                history.project + "," +
+                "時給制," +
+                history.minutes + "分," +
+                "," +
+                history.salary + "," +
+                (history.note || "");
+        }
+        //単価制
+        else if (history.type === "unit") {
+            line = history.date + "," +
+                history.project + "," +
+                "単価制," +
+                "," +
+                history.count + "件," +
+                history.salary + "," +
+                (history.note || "");
+        }
+        //管理者追加
+        else if (history.type === "admin") {
+            line = history.date + "," +
+                history.project + "," +
+                "管理者追加," +
+                "," + "," +
+                history.salary + "," +
+                (history.note || "");
+                
+        }
+        //改行して追加
+        csv += line + "\n";
+    });
+    //文字化け防止にBOM追加
+    const bom = "\uFEFF";
+    //文字列をBlobというブラウザ内の仮想ファイルに変換
+    const blob = new Blob(
+        [bom + csv],
+        { type: "text/csv" }
+    );
+    //blobをダウンロード可能なURLに変換
+    const url = URL.createObjectURL(blob);
+    //HTMLにリンクタグaを追加
+    const a = document.createElement("a");
+    //押した際のリンク先にcvsファイルのurlをセット
+    a.href = url;
+    //ファイル名を設定
+    a.download = "salary_history.csv";
+    //自動クリック機能で即ダウンロード
+    a.click();
+    //URL解放　使い切ったURLを削除しメモリ節約
+    URL.revokeObjectURL(url);
+
+});
+xlsx_Button.addEventListener("click", function () {
+    //Exsel用配列
+    const excel_Date = [];
+    //1件ずつ追加
+    histories.forEach(function (history) {
+        //時給制
+        if (history.type === "hourly") {
+            excel_Date.push({
+                "日付": history.date,
+                "案件名": history.project,
+                "種類": "時給制",
+                "勤務時間": history.minutes + "分",
+                "件数": "",
+                "給与": history.salary,
+                "備考": history.note || ""
+            });
+        }
+        //単価制
+        else if (history.type === "unit") {
+            excel_Date.push({
+                "日付": history.date,
+                "案件名": history.project,
+                "種類": "単価制",
+                "勤務時間": "",
+                "件数": history.count + "件",
+                "給与": history.salary,
+                "備考": history.note || ""
+            });
+        }
+        //管理者追加
+        else if (history.type === "admin") {
+            excel_Date.push({
+                "日付": history.date,
+                "案件名": history.project,
+                "種類": "管理者追加",
+                "勤務時間": "",
+                "件数": "",
+                "給与": history.salary,
+                "備考": history.note || ""
+            });
+        }
+        
+    });
+    //sheet1作成
+    const worksheet = XLSX.utils.json_to_sheet(excel_Date);
+    //列幅設定
+    worksheet["!cols"] = [
+        { wch: 15 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 30 }
+    ];
+    //格子を付ける
+    //範囲を取得
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+    //セルを一つずつ見る
+    for (let R = range.s.r; R <= range.e.r; ++R){
+        for (let C = range.s.c; C <= range.e.c; ++C){
+            //数字をexcel形式に変換
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+            //セルの中身を取得
+            const cell = worksheet[cellAddress];
+            //中身がなければスキップ
+            if (!cell) continue;
+            //格子を付ける
+            cell.s = {
+                border: {
+                    top: { style: "thin" },
+                    bottom: { style: "thin" },
+                    left: { style: "thin" },
+                    right: { style: "thin" }
+                    
+                }
+            }
+        }
+    }
+
+    //ファイル本体作成
+    const workbook = XLSX.utils.book_new();
+    //作ったシートに名前を付けてファイルに追加
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "勤怠シート"
+    );
+    //保存、ダウンロード
+    XLSX.writeFile(
+        workbook,
+        "salary_history.xlsx"
+    );
 });

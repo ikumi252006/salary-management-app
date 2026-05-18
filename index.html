@@ -14,7 +14,9 @@
 
     <link rel="stylesheet" href="style.css" />
     <!-- style.cssを読み込む-->
-  </head>
+   <script src="https://unpkg.com/xlsx-js-style/dist/xlsx.bundle.js"></script>
+    <!--xlsxで出力するときのurl-->
+  </head> 
   <!-- 設定ここまで -->
 
   <body>
@@ -87,17 +89,20 @@
         <button id="leaving_Button">退勤</button>
         <button id="break_Start_Button">休始</button>
         <button id="break_End_Button">休終</button>
+        <input id="hourly_Work_Note" type="text" placeholder="備考欄" />
       </div>
 
       <div id="unit_System_Section" style="display: none">
         <input id="work_Number" type="number" placeholder="件数" />
         <button id="unit_Work_Button">登録</button>
 
-        <input id="work_Note" type="text" placeholder="備考欄" />
+        <input id="unit_Work_Note" type="text" placeholder="備考欄" />
       </div>
     </div>
     <div id="history_Section" style="display: none">
       <h2>履歴確認</h2>
+      <button id="csv_Button">CSV出力</button>
+      <button id="xlsx_Button">xlsx出力</button>
 
       <div id="history_List"></div>
     </div>
@@ -136,7 +141,6 @@
         <button id="admin_Update_Button">更新する</button>
         <button id="admin_Delete_Button">削除する</button>
       </div>
-      <button id="csv_Button">CSV出力</button>
     </div>
 
     <script src="script.js"></script>
