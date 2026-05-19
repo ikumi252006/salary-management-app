@@ -134,16 +134,23 @@
           <option value="">履歴を選択</option>
         </select>
 
-        <input id="admin_Edit_Project_Name" type="text" placeholder="案件名" />
-        <input id="admin_Edit_Number" type="number" placeholder="金額" />
+        <input id="admin_Edit_Project_Name" type="text" placeholder="案件名" readonly />
+      <div id="admin_Hourly_Edit" style="display: none;">
+        <input id="admin_Edit_Minutes" type="number" placeholder="勤務分数" />
+      </div>
+      <div id="admin_Unit_Edit" style="display:none;">
+        <input id="admin_Edit_Count" type="number" placeholder="件数" />
+      </div>
+      <div id="admin_Admin_Edit" style="display: none;">
+        <input id="admin_Edit_Salary" type="number" placeholder="金額" />
+      </div>
         <input id="admin_Edit_Note" type="text" placeholder="備考欄" />
 
         <button id="admin_Update_Button">更新する</button>
         <button id="admin_Delete_Button">削除する</button>
       </div>
     </div>
-    <script type="module" src="firebase.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
     <!--script.jsをつなぐ-->
   </body>
   <!--見える部分終わり-->

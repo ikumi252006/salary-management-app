@@ -1,27 +1,16 @@
-// Firebase SDK
-import { initializeApp } from
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import {
-  getFirestore
-} from
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 自分の設定に変更
 const firebaseConfig = {
-  apiKey: "ここ",
-  authDomain: "ここ",
-  projectId: "ここ",
-  storageBucket: "ここ",
-  messagingSenderId: "ここ",
-  appId: "ここ"
+  apiKey: "AIzaSyC5_NrjhylGgUQvXkgGPcxEB_LwwFugmHM",
+  authDomain: "salary-management-app-ec716.firebaseapp.com",
+  projectId: "salary-management-app-ec716",
+  storageBucket: "salary-management-app-ec716.firebasestorage.app",
+  messagingSenderId: "203299365522",
+  appId: "1:203299365522:web:730c3adb91049259fe3c4b"
 };
 
-// 初期化
 const app = initializeApp(firebaseConfig);
 
-// Firestore
-const db = getFirestore(app);
-
-// 他ファイルで使えるように
-window.db = db;
+export const db = getFirestore(app);

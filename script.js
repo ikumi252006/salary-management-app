@@ -1,3 +1,10 @@
+import { db } from "./firebase.js";
+console.log("script start");
+window.addEventListener("DOMContentLoaded", async function () {
+    console.log("DOMContentLoaded");
+    await loadProjects();
+    await loadHistories();
+});
 //htmlのID取得、jsで使えるようにする
 //メニュー
 const menu_Select = document.getElementById("menu_Select");
@@ -45,15 +52,20 @@ const unit_Work_Button = document.getElementById("unit_Work_Button");
 const work_Date = document.getElementById("work_Date");
 const unit_Work_Note = document.getElementById("unit_Work_Note");
 //案件読み込み
-const projects = JSON.parse(localStorage.getItem("projects")) || [];
+let projects = [];
 //履歴
 const history_List = document.getElementById("history_List");
-const histories = JSON.parse(localStorage.getItem("histories")) || [];
-//管理者用履歴編集git 
+let histories = [];
+//管理者用履歴編集
 const admin_Pass = "2525";
 const admin_History_Select = document.getElementById("admin_History_Select");
+const admin_Hourly_Edit = document.getElementById("admin_Hourly_Edit");
+const admin_Unit_Edit = document.getElementById("admin_Unit_Edit");
+const admin_Admin_Edit = document.getElementById("admin_Admin_Edit");
 const admin_Edit_Project_Name = document.getElementById("admin_Edit_Project_Name");
-const admin_Edit_Number = document.getElementById("admin_Edit_Number");
+const admin_Edit_Minutes = document.getElementById("admin_Edit_Minutes");
+const admin_Edit_Count = document.getElementById("admin_Edit_Count");
+const admin_Edit_Salary = document.getElementById("admin_Edit_Salary");
 const admin_Edit_Note = document.getElementById("admin_Edit_Note");
 const admin_Update_Button = document.getElementById("admin_Update_Button");
 const admin_Delete_Button = document.getElementById("admin_Delete_Button");
@@ -66,9 +78,20 @@ const admin_Register_Button = document.getElementById("admin_Register_Button");
 const csv_Button = document.getElementById("csv_Button");
 //xlsx
 const xlsx_Button = document.getElementById("xlsx_Button");
+//firebase接続
+import {
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    updateDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 //メニューで選んだものを表示
 menu_Select.addEventListener("change", function () {
+    console.log("menu changed");
     register_Section.style.display = "none";
     edit_Section.style.display = "none";
     work_Section.style.display = "none";
@@ -125,34 +148,40 @@ admin_Menu_Select.addEventListener("change", function () {
     }
 });
 //案件登録の処理　
-register_Button.addEventListener("click", function () {
-
-    const project_Name = register_Project_Name.value;
-    const salary = register_Salary.value;
-    const project_Type = register_Type.value;
-    //名前が空なら受け付けない
-    if (project_Name === "") {
-        alert("案件名を入力してください。");
-        return;
+register_Button.addEventListener("click", async function () {
+    register_Button.disabled = true;
+    try {
+        const project_Name = register_Project_Name.value;
+        const salary = register_Salary.value;
+        const project_Type = register_Type.value;
+        //名前が空なら受け付けない
+        if (project_Name === "") {
+            alert("案件名を入力してください。");
+            return;
+        }
+        //選択されている案件の取得 duplicateに番号、projectに中身を入力
+        const duplicate = projects.some(function (project) {
+            return project.name === project_Name;
+        });
+        //名前が同じ案件があれば受け付けない
+        if (duplicate) {
+            alert("同じ名前の案件がすでに存在しています。");
+            return;
+        }
+        //配列に追加
+        await addDoc(collection(db, "projects"), {
+            name: project_Name,
+            type: project_Type,
+            salary: salary
+        })
+        await loadProjects();
+        alert("登録しました")
+    } catch (error) {
+        console.error(error);
+        alert("保存に失敗しました");
+    } finally {
+        register_Button.disabled = false;
     }
-    //選択されている案件の取得 duplicateに番号、projectに中身を入力
-    const duplicate = projects.some(function (project) {
-        return project.name === project_Name;
-    });
-    //名前が同じ案件があれば受け付けない
-    if (duplicate) {
-        alert("同じ名前の案件がすでに存在しています。");
-        return;
-    }
-    //配列に追加
-    projects.push({
-        name: project_Name,
-        type: project_Type,
-        salary: salary
-    });
-    //localStorageに追加
-    localStorage.setItem("projects", JSON.stringify(projects));
-    renderProjects();
 });
 //案件編集 
 edit_Project_Select.addEventListener("change", function () {
@@ -163,13 +192,16 @@ edit_Project_Select.addEventListener("change", function () {
         return project.name === selected;
     });
     //名前がなければ返す
-    if (!found) return;
+    if (!found) {
+        currentProject = null;
+        return;
+    }
     //フォームに値をセット
     edit_Project_Name.value = found.name;
     edit_Salary.value = found.salary;
     edit_Type.value = found.type;
 });
-edit_Button.addEventListener("click", function () {
+edit_Button.addEventListener("click", async function () {
     //選択された案件の配列の番号を取得
     const selected = edit_Project_Select.value;
     //選択されている案件の取得 indexに配列の番号、projectに中身を入力
@@ -179,22 +211,19 @@ edit_Button.addEventListener("click", function () {
     //選択してなければ返す
     if (index === -1) return;
     //上書き
-    projects[index] = {
+    await updateDoc(doc(db, "projects", projects[index].id), {
         name: edit_Project_Name.value,
         salary: edit_Salary.value,
         type: edit_Type.value
-    };
-    //ローカルストレージに保存
-    localStorage.setItem("projects", JSON.stringify(projects));
-
-    renderProjects();
+    });
+    await loadProjects();
     //フォームを空に
     edit_Project_Name.value = "";
     edit_Salary.value = "";
     edit_Type.value = "";
 });
 //削除ボタン
-delete_Button.addEventListener("click", function () {
+delete_Button.addEventListener("click", async function () {
 
     const selected_Name = edit_Project_Select.value;
     //選択されている案件の取得 indexに配列の番号、projectに中身を入力
@@ -206,22 +235,31 @@ delete_Button.addEventListener("click", function () {
     if (!ok) return;
     //index番目から１個削除
     if (index !== -1) {
-        projects.splice(index, 1);
+        await deleteDoc(doc(db, "projects", projects[index].id));
     }
-    //変更した配列を保存
-    localStorage.setItem("projects", JSON.stringify(projects));
-    //更新
-    renderProjects();
+    await loadProjects();
     //フォームを空に
     edit_Project_Name.value = "";
     edit_Salary.value = "";
     edit_Type.value = "";
 });
 
-//案件読み込み　
+//案件読み込み
+async function loadProjects() {
+    projects = [];
+    const querySnapshot = await getDocs(collection(db, "projects"));
+    querySnapshot.forEach(function (docItem) {
+        projects.push({
+            id: docItem.id,
+            ...docItem.data()
+        });
+    });
+    renderProjects();
+}
+
 function renderProjects() {
-    work_Project_Select.innerHTML = "<option>案件を選択</option>";
-    edit_Project_Select.innerHTML = "<option>案件を選択</option>";
+    work_Project_Select.innerHTML = '<option value="">案件を選択</option>';
+    edit_Project_Select.innerHTML = '<option value="">案件を選択</option>';
     //配列毎に順番にループ
     projects.forEach(function (project) {
         //HTMLでの<option>を作成
@@ -325,7 +363,7 @@ attend_Button.addEventListener("click", function () {
 });
 
 //退勤時
-leaving_Button.addEventListener("click", function () {
+leaving_Button.addEventListener("click", async function () {
     //勤務中でなければ返す
     if (status === "notWorking") {
         alert("出勤していません");
@@ -364,7 +402,7 @@ leaving_Button.addEventListener("click", function () {
     const salary = Math.floor(total_Minutes * (currentProject.salary / 60));
     const note = hourly_Work_Note.value;
     //historiesにpush
-    histories.push({
+    await addDoc(collection(db, "histories"), {
         type: "hourly",
         date: today_String,
         project: currentProject.name,
@@ -372,11 +410,7 @@ leaving_Button.addEventListener("click", function () {
         salary: salary,
         note: note
     });
-    //ローカルストレージに保存
-    localStorage.setItem(
-        "histories",
-        JSON.stringify(histories)
-    );
+    await loadHistories();
     //テキスト表示
     result.textContent = " 今回の勤務時間:" + hours + "時間" + minutes + "分 給与 " + (salary) + "円";
     //ステータスを戻す
@@ -415,7 +449,7 @@ break_End_Button.addEventListener("click", function () {
     status = "working"
 });
 //単価制
-unit_Work_Button.addEventListener("click", function () {
+unit_Work_Button.addEventListener("click", async function () {
     //プロジェクトを選択していないとき返す
     if (!currentProject) {
         alert("案件を選択してください");
@@ -438,7 +472,7 @@ unit_Work_Button.addEventListener("click", function () {
     //給料計算
     const salary = count * currentProject.salary;
     //historiesにデータをpushする
-    histories.push({
+    await addDoc(collection(db, "histories"), {
         type: "unit",
         date: today_String,
         project: currentProject.name,
@@ -446,16 +480,25 @@ unit_Work_Button.addEventListener("click", function () {
         note: note,
         salary: salary
     });
-    //保存
-    localStorage.setItem(
-        "histories",
-        JSON.stringify(histories)
-    );
+
+    await loadHistories();
     //画面に表示
     result.textContent = today_String + " / " + count + "件 / " + salary + "円";
 
 });
 //履歴表示
+async function loadHistories() {
+    histories = [];
+    const querySnapshot = await getDocs(collection(db, "histories"));
+    querySnapshot.forEach(function (docItem) {
+        histories.push({
+            id: docItem.id,
+            ...docItem.data()
+        });
+    });
+    render_Histories();
+}
+
 function render_Histories() {
     //リストをいったんリセット
     history_List.innerHTML = "";
@@ -579,20 +622,32 @@ admin_History_Select.addEventListener("change", function () {
     if (!history) return;
     //フォームに案件名、制度毎の数、金額、備考を入力
     admin_Edit_Project_Name.value = history.project;
+    admin_Edit_Note.value = history.note || "";
+
+    admin_Hourly_Edit.style.display = "none";
+    admin_Unit_Edit.style.display = "none";
+    admin_Admin_Edit.style.display = "none";
 
     if (history.type === "hourly") {
-        admin_Edit_Number.value = history.minutes;
+        admin_Hourly_Edit.style.display = "block";
+        admin_Edit_Minutes.value = history.minutes || "";
     }
 
     if (history.type === "unit") {
-        admin_Edit_Number.value = history.count;
+        admin_Unit_Edit.style.display = "block"
+        admin_Edit_Count.value = history.count || "";
+    }
+    if (history.type === "admin") {
+        admin_Admin_Edit.style.display = "block";
+        admin_Edit_Salary.value = history.salary || "";
     }
 
-    admin_Edit_Note.value = history.note || "";
+
 
 });
 //編集ボタン
-admin_Update_Button.addEventListener("click", function () {
+admin_Update_Button.addEventListener("click", async function () {
+    await loadProjects();
     //配列の番号を取得
     const index = admin_History_Select.value;
     //配列からデータ取り出し
@@ -603,34 +658,48 @@ admin_Update_Button.addEventListener("click", function () {
         return;
     }
     //案件名等を上書き
-    history.project = admin_Edit_Project_Name.value;
-
+    const updateData = {
+        project: history.project,
+        note: admin_Edit_Note.value,
+    };
+    //案件情報取得
+    const projectData = projects.find(function (project) {
+        return project.name === admin_Edit_Project_Name.value;
+    });
+    console.log(projectData)
     if (history.type === "hourly") {
-        history.minutes = Number(admin_Edit_Number.value);
+        const minutes = Number(admin_Edit_Minutes.value);
+        updateData.minutes = minutes;
+        updateData.salary = Math.floor(
+            minutes * (Number(projectData.salary) / 60)
+        );
     }
-
     if (history.type === "unit") {
-        history.count = Number(admin_Edit_Number.value);
+        const count = Number(admin_Edit_Count.value);
+        updateData.count = count;
+        updateData.salary = count * Number(projectData.salary);
+    }
+    if (history.type === "admin") {
+        updateData.salary = Number(admin_Edit_Salary.value);
     }
 
-    history.note = admin_Edit_Note.value;
-    //変更した配列を保存
-    localStorage.setItem(
-        "histories",
-        JSON.stringify(histories)
-    );
+    await updateDoc(doc(db, "histories", history.id), updateData);
+    await loadHistories();
+
+
     admin_Edit_Project_Name.value = "";
-    admin_Edit_Number.value = "";
+    admin_Edit_Minutes.value = "";
+    admin_Edit_Count.value = "";
+    admin_Edit_Salary.value = "";
     admin_Edit_Note.value = "";
     //完了通知
     alert("更新しました");
     //更新
     render_Admin_Histories();
-    render_Histories();
 
 });
 //削除ボタン
-admin_Delete_Button.addEventListener("click", function () {
+admin_Delete_Button.addEventListener("click", async function () {
     //選択した配列の番号を取得
     const index = admin_History_Select.value;
     //選んでなければ返す
@@ -642,25 +711,22 @@ admin_Delete_Button.addEventListener("click", function () {
     const ok = confirm("本当に削除しますか？");
     if (!ok) return;
     //配列のindex番目から一つ削除
-    histories.splice(index, 1);
-    //変更した配列を保存
-    localStorage.setItem(
-        "histories",
-        JSON.stringify(histories)
-    );
+    await deleteDoc(doc(db, "histories", histories[index].id));
+    await loadHistories();
     //フォームの初期化
     admin_Edit_Project_Name.value = "";
-    admin_Edit_Number.value = "";
+    admin_Edit_Minutes.value = "";
+    admin_Edit_Count.value = "";
+    admin_Edit_Salary.value = "";
     admin_Edit_Note.value = "";
     //更新
     render_Admin_Histories();
-    render_Histories();
     //完了通知
     alert("削除しました");
 
 });
 //履歴追加ボタン
-admin_Register_Button.addEventListener("click", function () {
+admin_Register_Button.addEventListener("click", async function () {
     //値の入力
     const project = admin_Register_Project_Name.value;
     const salary = Number(admin_Register_Salary.value);
@@ -684,19 +750,14 @@ admin_Register_Button.addEventListener("click", function () {
     }
 
     //履歴に追加
-    histories.push({
+    await addDoc(collection(db, "histories"), {
         type: "admin",
         date: date,
         project: project,
         salary: salary,
         note: note
     });
-
-    //保存
-    localStorage.setItem(
-        "histories",
-        JSON.stringify(histories)
-    );
+    await loadHistories();
 
     //フォーム初期化
     admin_Register_Project_Name.value = "";
@@ -704,7 +765,6 @@ admin_Register_Button.addEventListener("click", function () {
     admin_Register_Note.value = "";
 
     //更新
-    render_Histories();
     render_Admin_Histories();
 
     alert("履歴を追加しました");
@@ -744,7 +804,7 @@ csv_Button.addEventListener("click", function () {
                 "," + "," +
                 history.salary + "," +
                 (history.note || "");
-                
+
         }
         //改行して追加
         csv += line + "\n";
@@ -811,7 +871,7 @@ xlsx_Button.addEventListener("click", function () {
                 "備考": history.note || ""
             });
         }
-        
+
     });
     //sheet1作成
     const worksheet = XLSX.utils.json_to_sheet(excel_Date);
@@ -829,8 +889,8 @@ xlsx_Button.addEventListener("click", function () {
     //範囲を取得
     const range = XLSX.utils.decode_range(worksheet["!ref"]);
     //セルを一つずつ見る
-    for (let R = range.s.r; R <= range.e.r; ++R){
-        for (let C = range.s.c; C <= range.e.c; ++C){
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
             //数字をexcel形式に変換
             const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
             //セルの中身を取得
@@ -844,7 +904,7 @@ xlsx_Button.addEventListener("click", function () {
                     bottom: { style: "thin" },
                     left: { style: "thin" },
                     right: { style: "thin" }
-                    
+
                 }
             }
         }
