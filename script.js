@@ -8,6 +8,7 @@ window.addEventListener("DOMContentLoaded", async function () {
 //htmlのID取得、jsで使えるようにする
 //メニュー
 const menu_Select = document.getElementById("menu_Select");
+const select_Section = document.getElementById("select_Section")
 const register_Section = document.getElementById("register_Section");
 const edit_Section = document.getElementById("edit_Section");
 const work_Section = document.getElementById("work_Section");
@@ -92,6 +93,7 @@ import {
 //メニューで選んだものを表示
 menu_Select.addEventListener("change", function () {
     console.log("menu changed");
+    select_Section.style.display = "none"
     register_Section.style.display = "none";
     edit_Section.style.display = "none";
     work_Section.style.display = "none";
@@ -102,7 +104,9 @@ menu_Select.addEventListener("change", function () {
     unit_System_Section.style.display = "none";
     work_Project_Select.value = "";
     result.textContent = "";
-
+    if (menu_Select.value === "select") {
+        select_Section.style.display = "block";
+    }
     if (menu_Select.value === "register") {
         register_Section.style.display = "block";
     }

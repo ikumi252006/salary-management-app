@@ -27,13 +27,22 @@
 
     <h2>メニュー</h2>
     <select id="menu_Select">
-      <option value="">操作を選択</option>
+      <option value="select">操作を選択</option>
       <option value="register">案件登録</option>
       <option value="edit">案件編集</option>
       <option value="work">案件選択</option>
       <option value="history">履歴確認</option>
       <option value="admin_Edit">管理者用:履歴編集</option>
     </select>
+    <section id="select_Section" style="display: block;">
+      <h2>使い方</h2>
+      <h3>案件登録：新たに登録したい案件の情報を入力し、案件を登録ボタンで完了。</h3>
+        <h3>案件編集：既存の案件の情報を修正し、編集を保存ボタンで完了。削除も可能。</h3>
+        <h3>案件選択：既存の案件を一つ選択する。
+                 時給制なら勤怠を出勤退勤ボタンで管理。
+                 単価制は件数の入力後、登録ボタンで完了。</h3>
+        <h3>履歴確認：今までの勤怠情報を確認。テキストやExcelに出力可能。</h3>
+    </section>
 
     <section id="register_Section" style="display: none">
       <h2>案件登録</h2>

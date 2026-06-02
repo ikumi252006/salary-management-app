@@ -1,60 +1,78 @@
-body{/*ページ全体の設定*/
-    font-family: sans-serif;/*ゴシック体*/
-    background: #FFFFFF;
-    margin: 0;/*余白を消す*/
-    padding: 20px;/*端から20px開ける*/
+body {
+  /*ページ全体の設定*/
+  font-family: sans-serif; /*ゴシック体*/
+  background: #ffffff;
+  margin: 0; /*余白を消す*/
+  padding: 20px; /*端から20px開ける*/
 }
-main{
-    max-width: 800px;/*最大横幅が800px　大きくなりすぎない*/
-    margin: 0 auto;/*左右中央寄せ*/
+main {
+  max-width: 800px; /*最大横幅が800px　大きくなりすぎない*/
+  margin: 0 auto; /*左右中央寄せ*/
 }
 input,
 select,
-button{/*入力、選択、ボタンに同じデザインを適用*/
-    padding: 10px;
-    margin: 5px 0;
-    font-size: 16px;/*フォントサイズ*/
-    border-radius: 8px;/*角を丸くする*/
-    border: 1px solid #ccc;/*薄いグレーで枠をとる*/
-    box-sizing: border-box;/*widthの中にpaddingとborderを含める*/
+button {
+  /*入力、選択、ボタンに同じデザインを適用*/
+  padding: 10px;
+  margin: 5px 0;
+  font-size: 16px; /*フォントサイズ*/
+  border-radius: 8px; /*角を丸くする*/
+  border: 1px solid #ccc; /*薄いグレーで枠をとる*/
+  box-sizing: border-box; /*widthの中にpaddingとborderを含める*/
 }
-button{/*ボタンのみ*/
-    background: #4f46e5;/*全体青紫*/
-    color: white;/*文字白色*/
-    border: none;/*枠なし*/
-    cursor: pointer;/*カーソルを合わせるとマークが出る*/
-    transition: 0.2s;/*滑らかに色を変えるアニメーション*/
+button {
+  /*ボタンのみ*/
+  background: #4f46e5; /*全体青紫*/
+  color: white; /*文字白色*/
+  border: none; /*枠なし*/
+  cursor: pointer; /*カーソルを合わせるとマークが出る*/
+  transition: 0.2s; /*滑らかに色を変えるアニメーション*/
 }
-button:hover{/*hover=マウスを乗せた時*/
-    background: #3730a3;/*色を少しだけ濃くする*/
+button:hover {
+  /*hover=マウスを乗せた時*/
+  background: #3730a3; /*色を少しだけ濃くする*/
 }
 section {
-    background: rgb(250, 242, 242);/*セクション内のみ少し色を変える*/
-    padding: 20px;/*内側の余白*/
-    margin-bottom: 20px;/*下に20px開ける*/
-    border-radius: 12px;/*各丸*/
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);/*影を下2pxに少しふわっとした透明度10％黒色のぼかし*/
+  background: rgb(250, 242, 242); /*セクション内のみ少し色を変える*/
+  padding: 20px; /*内側の余白*/
+  margin-bottom: 20px; /*下に20px開ける*/
+  border-radius: 12px; /*各丸*/
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /*影を下2pxに少しふわっとした透明度10％黒色のぼかし*/
 }
-#history_List div{/*履歴の１件ごと*/
-    padding: 12px;/*余白*/
-    border-bottom: 1px solid #ddd;/*下線*/
+#history_List {
+  max-height: 300px;
+  overflow-y: auto;
+}
+#history_List div {
+  /*履歴の１件ごと*/
+  padding: 12px; /*余白*/
+  border-bottom: 1px solid #ddd; /*下線*/
 }
 #history_List div:hover {
-    background: #f0f0f0;/*マウスを乗せると灰色に*/
+  background: #f0f0f0; /*マウスを乗せると灰色に*/
 }
-#work_Result {/*勤務時間と給与表示時*/
-    font-size: 20px;/*文字を大きめに*/
-    font-weight: bold;/*太字で*/
-    margin-top: 20px;/*上に余白*/
-    color: #2563eb;/*青色文字*/
+#work_Result {
+  /*勤務時間と給与表示時*/
+  font-size: 20px; /*文字を大きめに*/
+  font-weight: bold; /*太字で*/
+  margin-top: 20px; /*上に余白*/
+  color: #2563eb; /*青色文字*/
 }
-@media (max-width: 600px){/*画面幅が600px以下の時（スマホ向き）*/
-    input,
-    select,
-    button {
-        width: 100%;/*横幅いっぱいにして押しやすく*/
-    }
-    body{
-        padding: 10px;/*余白を迫目に*/
-    }
+@media (max-width: 600px) {
+  /*画面幅が600px以下の時（スマホ向き）*/
+  input,
+  select,
+  button {
+    width: 100%; /*横幅いっぱいにして押しやすく*/
+  }
+  body {
+    padding: 10px; /*余白を迫目に*/
+  }
+}
+#admin_Update_Button {
+  background: #ee680f;
+}
+#edit_Button {
+    background: #ee680f;
+    
 }
