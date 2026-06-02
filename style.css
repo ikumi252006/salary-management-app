@@ -1,0 +1,60 @@
+body{/*ページ全体の設定*/
+    font-family: sans-serif;/*ゴシック体*/
+    background: #FFFFFF;
+    margin: 0;/*余白を消す*/
+    padding: 20px;/*端から20px開ける*/
+}
+main{
+    max-width: 800px;/*最大横幅が800px　大きくなりすぎない*/
+    margin: 0 auto;/*左右中央寄せ*/
+}
+input,
+select,
+button{/*入力、選択、ボタンに同じデザインを適用*/
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 16px;/*フォントサイズ*/
+    border-radius: 8px;/*角を丸くする*/
+    border: 1px solid #ccc;/*薄いグレーで枠をとる*/
+    box-sizing: border-box;/*widthの中にpaddingとborderを含める*/
+}
+button{/*ボタンのみ*/
+    background: #4f46e5;/*全体青紫*/
+    color: white;/*文字白色*/
+    border: none;/*枠なし*/
+    cursor: pointer;/*カーソルを合わせるとマークが出る*/
+    transition: 0.2s;/*滑らかに色を変えるアニメーション*/
+}
+button:hover{/*hover=マウスを乗せた時*/
+    background: #3730a3;/*色を少しだけ濃くする*/
+}
+section {
+    background: rgb(0, 0, 0);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1)
+}
+#history_List div{
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+#history_List div:hover {
+    background: #f0f0f0;
+}
+#work_Result {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #2563eb;
+}
+@media (max-width: 600px){
+    input,
+    select,
+    button {
+        width: 100%;
+    }
+    body{
+        padding: 10px;
+    }
+}
