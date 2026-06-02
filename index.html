@@ -35,7 +35,7 @@
       <option value="admin_Edit">管理者用:履歴編集</option>
     </select>
 
-    <div id="register_Section" style="display: none">
+    <section id="register_Section" style="display: none">
       <h2>案件登録</h2>
 
       <input id="register_Project_Name" type="text" placeholder="案件名" />
@@ -50,9 +50,9 @@
       <!--金額を入力-->
 
       <button id="register_Button">案件を登録</button>
-    </div>
+    </section>
 
-    <div id="edit_Section" style="display: none">
+    <section id="edit_Section" style="display: none">
       <h2>案件編集</h2>
 
       <p>編集したい案件を選択</p>
@@ -73,9 +73,9 @@
 
       <button id="edit_Button">編集を保存</button>
       <button id="delete_Button">削除</button>
-    </div>
+    </section>
 
-    <div id="work_Section" style="display: none">
+    <section id="work_Section" style="display: none">
       <h2>案件選択</h2>
 
       <p id="work_Result">ここに金額が表示されます</p>
@@ -84,29 +84,29 @@
         <option>案件を選択</option>
       </select>
 
-      <div id="hourly_System_Section" style="display: none">
+      <section id="hourly_System_Section" style="display: none">
         <button id="attend_Button">出勤</button>
         <button id="leaving_Button">退勤</button>
         <button id="break_Start_Button">休始</button>
         <button id="break_End_Button">休終</button>
         <input id="hourly_Work_Note" type="text" placeholder="備考欄" />
-      </div>
+      </section>
 
-      <div id="unit_System_Section" style="display: none">
+      <section id="unit_System_Section" style="display: none">
         <input id="work_Number" type="number" placeholder="件数" />
         <button id="unit_Work_Button">登録</button>
 
         <input id="unit_Work_Note" type="text" placeholder="備考欄" />
-      </div>
-    </div>
-    <div id="history_Section" style="display: none">
+      </section>
+    </section>
+    <section id="history_Section" style="display: none">
       <h2>履歴確認</h2>
       <button id="csv_Button">CSV出力</button>
       <button id="xlsx_Button">xlsx出力</button>
 
-      <div id="history_List"></div>
-    </div>
-    <div id="admin_History_Edit_Section" style="display: none">
+      <section id="history_List"></section>
+      </section>
+    <section id="admin_History_Edit_Section" style="display: none">
       <h2>管理者用：履歴編集</h2>
       <select id="admin_Menu_Select">
         <option value="">操作を選択</option>
@@ -114,7 +114,7 @@
         <option value="admin_Edit">案件を編集</option>
       </select>
 
-      <div id="admin_Register_Section" style="display: none">
+      <section id="admin_Register_Section" style="display: none">
         <input
           id="admin_Register_Project_Name"
           type="text"
@@ -125,9 +125,9 @@
         <input id="admin_Register_Note" type="text" placeholder="備考欄" />
 
         <button id="admin_Register_Button">登録する</button>
-      </div>
+      </section>
 
-      <div id="admin_Edit_Section" style="display: none">
+      <section id="admin_Edit_Section" style="display: none">
         <p>編集する案件を選択</p>
 
         <select id="admin_History_Select">
@@ -135,21 +135,21 @@
         </select>
 
         <input id="admin_Edit_Project_Name" type="text" placeholder="案件名" readonly />
-      <div id="admin_Hourly_Edit" style="display: none;">
+      <section id="admin_Hourly_Edit" style="display: none;">
         <input id="admin_Edit_Minutes" type="number" placeholder="勤務分数" />
-      </div>
-      <div id="admin_Unit_Edit" style="display:none;">
+      </section>
+      <section id="admin_Unit_Edit" style="display:none;">
         <input id="admin_Edit_Count" type="number" placeholder="件数" />
-      </div>
-      <div id="admin_Admin_Edit" style="display: none;">
+      </section>
+      <section id="admin_Admin_Edit" style="display: none;">
         <input id="admin_Edit_Salary" type="number" placeholder="金額" />
-      </div>
+      </section>
         <input id="admin_Edit_Note" type="text" placeholder="備考欄" />
 
         <button id="admin_Update_Button">更新する</button>
         <button id="admin_Delete_Button">削除する</button>
-      </div>
-    </div>
+      </section>
+    </section>
     <script type="module" src="script.js"></script>
     <!--script.jsをつなぐ-->
     </main>
