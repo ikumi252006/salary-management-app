@@ -34,26 +34,21 @@ const delete_Button = document.getElementById("delete_Button");
 const work_Project_Select = document.getElementById("work_Project_Select");
 const hourly_System_Section = document.getElementById("hourly_System_Section");
 const unit_System_Section = document.getElementById("unit_System_Section");
+const result = document.getElementById("work_Result")
 //時給制
-const attend_Button = document.getElementById("attend_Button");
-const leaving_Button = document.getElementById("leaving_Button");
-const break_Start_Button = document.getElementById("break_Start_Button");
-const break_End_Button = document.getElementById("break_End_Button");
-const result = document.getElementById("work_Result");
+const work_Date = document.getElementById("work_Date");
+const start_Time = document.getElementById("start_Time");
+const end_Time = document.getElementById("end_Time");
+const break_Time = document.getElementById("break_Time");
+const hourly_Work_Button = document.getElementById("hourly_Work_Button");
 const hourly_Work_Note = document.getElementById("hourly_Work_Note");
-let timer = null;
-let breakStart = null;
-let totalBreak = 0;
-let status = "notWorking";
-let currentProject = null;
-let pausedWorkTime = 0;
 //単価制
 const work_Number = document.getElementById("work_Number");
 const unit_Work_Button = document.getElementById("unit_Work_Button");
-const work_Date = document.getElementById("work_Date");
 const unit_Work_Note = document.getElementById("unit_Work_Note");
 //案件読み込み
 let projects = [];
+let currentProject = null;
 //履歴
 const history_List = document.getElementById("history_List");
 let histories = [];
@@ -74,6 +69,7 @@ const admin_Delete_Button = document.getElementById("admin_Delete_Button");
 const admin_Register_Project_Name = document.getElementById("admin_Register_Project_Name");
 const admin_Register_Salary = document.getElementById("admin_Register_Salary");
 const admin_Register_Note = document.getElementById("admin_Register_Note");
+const admin_Work_Date = document.getElementById("admin_Work_Date");
 const admin_Register_Button = document.getElementById("admin_Register_Button");
 //CSV出力
 const csv_Button = document.getElementById("csv_Button");
@@ -103,7 +99,7 @@ menu_Select.addEventListener("change", function () {
     hourly_System_Section.style.display = "none";
     unit_System_Section.style.display = "none";
     work_Project_Select.value = "";
-    result.textContent = "";
+    currentProject = null;
     if (menu_Select.value === "select") {
         select_Section.style.display = "block";
     }
@@ -200,6 +196,7 @@ edit_Project_Select.addEventListener("change", function () {
         currentProject = null;
         return;
     }
+    currentProject = found;
     //フォームに値をセット
     edit_Project_Name.value = found.name;
     edit_Salary.value = found.salary;
@@ -283,12 +280,6 @@ function renderProjects() {
 }
 //案件選択
 work_Project_Select.addEventListener("change", function () {
-    //勤務中に変えようとしたら返す
-    if (status !== "notWorking") {
-        alert("勤務中は案件変更できません");
-        work_Project_Select.value = currentProject.name;
-        return;
-    }
     //選択された案件の配列の番号を取得
     const selected = work_Project_Select.value;
     //選択されている案件の取得
@@ -297,7 +288,6 @@ work_Project_Select.addEventListener("change", function () {
     });
     //見つからなければ返す
     if (!found) return;
-    currentProject = found;
     //制度ごとに表示
     hourly_System_Section.style.display = "none";
     unit_System_Section.style.display = "none";
@@ -309,148 +299,57 @@ work_Project_Select.addEventListener("change", function () {
         unit_System_Section.style.display = "block";
 
     }
+    currentProject = found;
 
 });
 
-//出勤時
-attend_Button.addEventListener("click", function () {
-    //案件を選択してないときに返す
+//時給制
+hourly_Work_Button.addEventListener("click", async function () {
+
     if (!currentProject) {
         alert("案件を選択してください");
         return;
     }
-    //勤務中に出勤を押した場合に返す
-    if (status !== "notWorking") {
-        alert("すでに出勤しています");
-        return;
-    }
-    //ステータスを勤務中に変更
-    status = "working";
-    //スタート時の時間を取得
-    const start = Date.now();
-    //ローカルストレージに保存
-    localStorage.setItem("startTime", start);
-    //合計休憩時間のリセット
-    totalBreak = 0;
-    //時間が取得できないとき返す
-    if (!start) {
-        alert("時間が正しく取得できませんでした");
-        return;
-    }
-    //タイマーあればリセット
-    if (timer) clearInterval(timer);
-
-    //時間表示
-    //1秒ごとに繰り返す
-    timer = setInterval(function () {
-        //今の時間取得
-        const now = Date.now();
-        //今の勤務時間をworkTimeに挿入
-        let workTime = now - start - totalBreak;
-        //休憩中ならストップ
-        if (status === "onBreak") {
-            workTime = pausedWorkTime;
-        }
-        //現在の勤務時間等を画面に出力
-        const total_Seconds = Math.floor(workTime / 1000);
-        const hours = String(Math.floor(total_Seconds / 3600)).padStart(2, "0");
-        const minutes = String(Math.floor((total_Seconds % 3600) / 60)).padStart(2, "0");
-        const seconds = String(Math.floor(total_Seconds % 60)).padStart(2, "0");
-        const salary = Math.floor((workTime / (1000 * 60 * 60)) * currentProject.salary);
-        if (status === "onBreak") {
-            result.textContent = "休憩中 / " + "現在の勤務時間  " + hours + ":" + minutes + ":" + seconds + " / 現在の給与:" + salary + "円";
-        } else {
-            result.textContent = "勤務中 / " + "現在の勤務時間  " + hours + ":" + minutes + ":" + seconds + " / 現在の給与:" + salary + "円";
-        }
-
-    }, 1000);
-});
-
-//退勤時
-leaving_Button.addEventListener("click", async function () {
-    //勤務中でなければ返す
-    if (status === "notWorking") {
-        alert("出勤していません");
-        return;
-    }
-    //休憩中なら返す
-    if (status === "onBreak") {
-        alert("休憩中です");
-        return;
-    }
-    //データの取得
-    const start = Number(localStorage.getItem("startTime"));
-    const end = Date.now();
-    const today = new Date();
-    const year = today.getFullYear();
-    //1桁の数字でも二桁目0が入る
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    //文字列にまとめてる yyyy-mm-dd
-    const today_String = year + "-" + month + "-" + day;
-
-    work_Date.value = today_String;
-    //終了時間が得られなければ返す
-    if (!end) {
-        alert("時間が正しく取得できませんでした");
-        return;
-    }
-    //タイマークリア
-    if (timer) clearInterval(timer);
-    //workTime、給料等計算　給料は1分単位で切り上げ
-    let workTime = end - start - totalBreak;
-    const total_Minutes = Math.ceil(workTime / (1000 * 60));
-    const total_Seconds = Math.floor(workTime / 1000);
-    const hours = String(Math.floor(total_Seconds / 3600)).padStart(2, "0");
-    const minutes = String(Math.ceil((total_Seconds % 3600) / 60)).padStart(2, "0");
-    const salary = Math.floor(total_Minutes * (currentProject.salary / 60));
+    const date = work_Date.value;
+    const start = start_Time.value;
+    const end = end_Time.value;
+    const breakMinutes = Number(break_Time.value);
     const note = hourly_Work_Note.value;
-    //historiesにpush
-    await addDoc(collection(db, "histories"), {
-        type: "hourly",
-        date: today_String,
-        project: currentProject.name,
-        minutes: total_Minutes,
-        salary: salary,
-        note: note
-    });
-    await loadHistories();
-    //テキスト表示
-    result.textContent = " 今回の勤務時間:" + hours + "時間" + minutes + "分 給与 " + (salary) + "円";
-    //ステータスを戻す
-    status = "notWorking";
-    //備考欄を空にする
-    hourly_Work_Note.value = "";
-});
-//休憩開始時
-break_Start_Button.addEventListener("click", function () {
-    //出勤してないときに返す
-    if (status !== "working") {
-        alert("出勤していません");
-        return;
-    }
-    //ステータスを休憩中に変更
-    status = "onBreak";
-    breakStart = Date.now();
-    //休憩に入った瞬間までの実際の勤務時間をキープ
-    pausedWorkTime = breakStart - Number(localStorage.getItem("startTime")) - totalBreak;
+    const startDate = new Date(date + "T" + start);
+    const endDate = new Date(date + "T" + end);
+    let workMinutes =
+        (endDate - startDate)
+        / 60000;
+    workMinutes -= breakMinutes;
+    const salary =
+        Math.floor(
+            workMinutes * currentProject.salary / 60
+        );
+    await addDoc(
+        collection(db, "histories"),
+        {
+            type: "hourly",
+            date,
+            project: currentProject.name,
+            minutes: workMinutes,
+            salary,
+            note
+        }
+    );
 
-});
-//休憩終了時
-break_End_Button.addEventListener("click", function () {
-    //休憩中でなければ返す
-    if (status !== "onBreak") {
-        alert("休憩中ではありません");
-        return;
-    }
-    //休憩時間の計算
-    const breakTime = Date.now() - breakStart;
-    //合計休憩時間に今回の休憩時間をプラス
-    totalBreak += breakTime;
-    //休憩時間をリセット
-    breakStart = null;
-    //ステータスを勤務中に変更
-    status = "working"
+    await loadHistories();
+
+    result.textContent =
+        date + " / " +
+        Math.floor(workMinutes / 60) + "時間" +
+        (workMinutes % 60) + "分 / " +
+        salary + "円";
+    alert("登録しました");
+    work_Date.value = null;
+    start_Time.value = null;
+    end_Time.value = null;
+    break_Time.value = null;
+    hourly_Work_Note = null;
 });
 //単価制
 unit_Work_Button.addEventListener("click", async function () {
@@ -488,7 +387,7 @@ unit_Work_Button.addEventListener("click", async function () {
     await loadHistories();
     //画面に表示
     result.textContent = today_String + " / " + count + "件 / " + salary + "円";
-
+    work_Number.value = null;
 });
 //履歴表示
 async function loadHistories() {
@@ -928,3 +827,4 @@ xlsx_Button.addEventListener("click", function () {
         "salary_history.xlsx"
     );
 });
+
